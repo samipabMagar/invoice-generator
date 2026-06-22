@@ -4,35 +4,44 @@ import { useState } from 'react';
 import { supabase } from '@/lib/supabase/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function LoginPage() {
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
-    
-    if (error) toast.error(error.message);
-    else {
-      toast.success('Welcome back!');
-      router.push('/');
+    if (!email || !password) {
+      toast.error('Please enter your email and password');
+      return;
     }
-  };
-
-  const handleSignUp = async () => {
-    setLoading(true);
-    const { error } = await supabase.auth.signUp({ email, password });
-    setLoading(false);
     
-    if (error) toast.error(error.message);
-    else toast.success('Account created! You can now log in.');
+    setLoading(true);
+    
+    if (isSignUp) {
+      const { error } = await supabase.auth.signUp({ email, password });
+      setLoading(false);
+      if (error) toast.error(error.message);
+      else {
+        toast.success('Account created successfully! You can now log in.');
+        setIsSignUp(false); // Toggle back to login mode automatically
+        setPassword('');
+      }
+    } else {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      setLoading(false);
+      if (error) toast.error(error.message);
+      else {
+        toast.success('Welcome back!');
+        router.push('/');
+      }
+    }
   };
 
   return (
@@ -78,18 +87,22 @@ export default function LoginPage() {
           </div>
 
           <div className="text-center lg:text-left">
-            <h2 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">Welcome</h2>
-            <p className="text-slate-500">Enter your details to access your account.</p>
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">
+              {isSignUp ? 'Create Account' : 'Welcome'}
+            </h2>
+            <p className="text-slate-500">
+              {isSignUp ? 'Sign up to start saving your professional invoices.' : 'Enter your details to access your account.'}
+            </p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-slate-700">Email Address</label>
               <input 
                 type="email" 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Ex. nayan@example.com"
+                placeholder="nayan@example.com"
                 className="flex h-12 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition-all"
                 required
               />
@@ -97,36 +110,49 @@ export default function LoginPage() {
             
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-slate-700">Password</label>
-              <input 
-                type="password" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
-                className="flex h-12 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition-all"
-                required
-              />
+              <div className="relative">
+                <input 
+                  type={showPassword ? 'text' : 'password'} 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  className="flex h-12 w-full rounded-md border border-slate-200 bg-white px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition-all"
+                  required
+                  minLength={6}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors focus:outline-none cursor-pointer"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
 
             <div className="pt-2">
               <button 
                 type="submit" 
                 disabled={loading}
-                className="w-full h-12 inline-flex items-center justify-center rounded-md bg-slate-900 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50 transition-colors shadow-sm"
+                className="w-full h-12 inline-flex items-center justify-center rounded-md bg-slate-900 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm cursor-pointer"
               >
-                {loading ? 'Processing...' : 'Sign In'}
+                {loading ? 'Processing...' : (isSignUp ? 'Sign Up' : 'Sign In')}
               </button>
             </div>
           </form>
 
           <div className="mt-10 pt-6 border-t border-slate-100 text-center">
-            <p className="text-sm text-slate-500 mb-4">Don't have an account yet?</p>
+            <p className="text-sm text-slate-500 mb-4">
+              {isSignUp ? 'Already have an account?' : "Don't have an account yet?"}
+            </p>
             <button 
               type="button"
-              onClick={handleSignUp}
+              onClick={() => setIsSignUp(!isSignUp)}
               disabled={loading}
-              className="w-full h-12 inline-flex items-center justify-center border border-slate-200 bg-white hover:bg-slate-50 text-slate-900 font-medium text-sm rounded-md transition-colors shadow-sm disabled:opacity-50"
+              className="w-full h-12 inline-flex items-center justify-center border border-slate-200 bg-white hover:bg-slate-50 text-slate-900 font-medium text-sm rounded-md transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
-              Create new account
+              {isSignUp ? 'Sign In' : 'Create new account'}
             </button>
           </div>
 

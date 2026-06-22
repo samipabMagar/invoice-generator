@@ -3,12 +3,28 @@
 import { FormProvider, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
-import { UserCircle } from 'lucide-react';
+import { UserCircle, LogOut } from 'lucide-react';
 import { defaultInvoiceValues, invoiceSchema, InvoiceType } from '@/lib/schema';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase/supabase';
 import { InvoiceEditor } from '@/components/invoice-editor';
 import { InvoicePreview } from '@/components/invoice-preview';
 
 export default function Home() {
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setUser(session?.user || null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+  };
+
   const methods = useForm<InvoiceType>({
     resolver: zodResolver(invoiceSchema),
     defaultValues: defaultInvoiceValues,
@@ -31,9 +47,18 @@ export default function Home() {
               <h1 className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">Professional Invoice Generator</h1>
               <div className="flex items-center gap-3 mt-3 sm:mt-0">
                 <p className="text-xs text-sky-600 bg-sky-100 px-3 py-1 rounded-full inline-flex lg:hidden">Scroll right to view invoice →</p>
-                <Link href="/login" className="flex items-center gap-2 text-sm font-medium text-slate-700 hover:text-sky-600 bg-white border border-slate-200 px-4 py-2 rounded-md shadow-sm hover:shadow transition-all">
-                  <UserCircle className="w-4 h-4" /> Sign in
-                </Link>
+                {user ? (
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm font-medium text-slate-600 hidden sm:inline-flex">{user.email}</span>
+                    <button onClick={handleSignOut} type="button" className="flex items-center gap-2 text-sm font-medium text-rose-600 hover:text-rose-700 bg-rose-50 border border-rose-100 px-4 py-2 rounded-md shadow-sm hover:shadow transition-all">
+                      <LogOut className="w-4 h-4" /> Sign out
+                    </button>
+                  </div>
+                ) : (
+                  <Link href="/auth" className="flex items-center gap-2 text-sm font-medium text-slate-700 hover:text-sky-600 bg-white border border-slate-200 px-4 py-2 rounded-md shadow-sm hover:shadow transition-all">
+                    <UserCircle className="w-4 h-4" /> Sign in
+                  </Link>
+                )}
               </div>
             </div>
 
