@@ -7,8 +7,10 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, Trash2, Download } from 'lucide-react';
+import { Plus, Trash2, Download, Save } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { supabase } from '@/lib/supabase/supabase';
+import { toast } from 'sonner';
 
 export function InvoiceEditor() {
   const { register, control, getValues, formState: { errors } } = useFormContext<InvoiceType>();
@@ -17,6 +19,38 @@ export function InvoiceEditor() {
     control,
     name: 'items',
   });
+
+  const handleSave = async () => {
+    const values = getValues();
+    try {
+      const loadingToast = toast.loading('Saving invoice...');
+      
+      // Ensure we attempt to grab the currently logged in user context
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      const { error } = await supabase.from('invoices').insert({
+        user_id: user?.id, // Requires an active session & auth.users link according to our schema
+        invoice_number: values.invoiceMeta.invoiceNo,
+        date: values.invoiceMeta.date,
+        due_date: values.invoiceMeta.dueDate,
+        items: values.items,
+        status: 'saved',
+      });
+      
+      toast.dismiss(loadingToast);
+      
+      if (error) {
+         console.error('Supabase Save Error:', error);
+         toast.error(`Error: ${error.message || 'Check Auth state'}`);
+         return;
+      }
+      
+      toast.success('Invoice securely saved to Supabase!');
+    } catch (err: any) {
+      toast.dismiss();
+      toast.error(err?.message || 'Failed to save');
+    }
+  };
 
   const handleDownload = async () => {
     const values = getValues();
@@ -41,9 +75,14 @@ export function InvoiceEditor() {
           <h2 className="text-2xl font-bold tracking-tight text-slate-800">Edit Details</h2>
           <p className="text-sm text-slate-500">Fill in the fields to update the preview instantly.</p>
         </div>
-        <Button onClick={handleDownload} type="button" className="bg-sky-500 hover:bg-sky-600 shadow-lg shadow-sky-500/20 gap-2">
-          <Download className="w-4 h-4" /> Export PDF
-        </Button>
+        <div className="flex gap-3">
+          <Button onClick={handleSave} type="button" variant="outline" className="gap-2">
+            <Save className="w-4 h-4" /> Save
+          </Button>
+          <Button onClick={handleDownload} type="button" className="bg-sky-500 text-white hover:bg-sky-600 shadow-lg shadow-sky-500/20 gap-2">
+            <Download className="w-4 h-4" /> Export PDF
+          </Button>
+        </div>
       </div>
 
       <div className="space-y-6">
@@ -58,7 +97,7 @@ export function InvoiceEditor() {
               <Label>Business / Sender Name</Label>
               <Input {...register('senderDetails.name')} placeholder="e.g. Nayan Thapa" />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>BSB</Label>
                 <Input {...register('senderDetails.bsb')} placeholder="082451" />
@@ -76,7 +115,7 @@ export function InvoiceEditor() {
           <CardHeader className="pb-4">
             <CardTitle className="text-lg">Invoice Details</CardTitle>
           </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-4">
+          <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Invoice No</Label>
               <Input {...register('invoiceMeta.invoiceNo')} />
@@ -133,7 +172,7 @@ export function InvoiceEditor() {
                   <Label>Description</Label>
                   <Input {...register(`items.${index}.description` as const)} placeholder="e.g. Tuesday" />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Quantity (Hours)</Label>
                     <Input {...register(`items.${index}.quantity` as const, { valueAsNumber: true })} type="number" step="0.5" />

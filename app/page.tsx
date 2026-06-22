@@ -23,15 +23,19 @@ export default function Home() {
           </section>
           
           {/* Right Column: Live Preview & Action Bar */}
-          <section className="flex-1 bg-slate-100/50 p-4 md:p-8 overflow-y-auto flex flex-col items-center">
+          <section className="flex-1 bg-slate-100/50 p-4 md:p-8 overflow-y-auto overflow-x-hidden flex flex-col items-center">
             {/* Action Bar */}
-            <div className="w-full max-w-[800px] mb-6 flex justify-between items-center">
+            <div className="w-full max-w-[800px] mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center">
               <h1 className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">Professional Invoice Generator</h1>
+              <p className="text-xs text-sky-600 bg-sky-100 px-3 py-1 rounded-full mt-2 sm:mt-0 inline-flex lg:hidden">Scroll right to view whole invoice →</p>
             </div>
 
-            {/* A4 Paper Wrapper */}
-            <div className="bg-white shadow-2xl rounded-sm w-full max-w-[800px] min-h-[1131px] aspect-[1/1.414] overflow-hidden border border-slate-200/60 ring-1 ring-slate-900/5 mb-20 relative">
-              <InvoicePreview />
+            {/* Scrollable Container for Mobile */}
+            <div className="w-full overflow-x-auto pb-12 flex justify-start lg:justify-center">
+              {/* A4 Paper Wrapper exactly sized */}
+              <div className="bg-white shadow-2xl rounded-sm w-[800px] min-w-[800px] h-[1131px] flex-shrink-0 overflow-hidden border border-slate-200/60 ring-1 ring-slate-900/5 relative text-left">
+                <InvoicePreview />
+              </div>
             </div>
           </section>
         </form>
