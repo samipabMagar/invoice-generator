@@ -2,6 +2,8 @@
 
 import { FormProvider, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import Link from 'next/link';
+import { UserCircle } from 'lucide-react';
 import { defaultInvoiceValues, invoiceSchema, InvoiceType } from '@/lib/schema';
 import { InvoiceEditor } from '@/components/invoice-editor';
 import { InvoicePreview } from '@/components/invoice-preview';
@@ -25,9 +27,14 @@ export default function Home() {
           {/* Right Column: Live Preview & Action Bar */}
           <section className="flex-1 bg-slate-100/50 p-4 md:p-8 overflow-y-auto overflow-x-hidden flex flex-col items-center">
             {/* Action Bar */}
-            <div className="w-full max-w-[800px] mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center">
+            <div className="w-full max-w-[800px] mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center">
               <h1 className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">Professional Invoice Generator</h1>
-              <p className="text-xs text-sky-600 bg-sky-100 px-3 py-1 rounded-full mt-2 sm:mt-0 inline-flex lg:hidden">Scroll right to view whole invoice →</p>
+              <div className="flex items-center gap-3 mt-3 sm:mt-0">
+                <p className="text-xs text-sky-600 bg-sky-100 px-3 py-1 rounded-full inline-flex lg:hidden">Scroll right to view invoice →</p>
+                <Link href="/login" className="flex items-center gap-2 text-sm font-medium text-slate-700 hover:text-sky-600 bg-white border border-slate-200 px-4 py-2 rounded-md shadow-sm hover:shadow transition-all">
+                  <UserCircle className="w-4 h-4" /> Sign in
+                </Link>
+              </div>
             </div>
 
             {/* Scrollable Container for Mobile */}
