@@ -16,16 +16,16 @@ export default function Home() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 overflow-hidden">
+    <div className="min-h-screen bg-slate-50 text-slate-900">
       <FormProvider {...methods}>
-        <form className="h-screen flex flex-col md:flex-row">
+        <form className="flex flex-col md:flex-row md:h-screen">
           {/* Left Column: Form Editor */}
-          <section className="w-full md:w-1/2 lg:w-[500px] bg-white border-r border-slate-200 overflow-y-auto z-10 shadow-xl shadow-slate-200/50 flex-shrink-0 hide-scrollbar">
+          <section className="w-full md:w-1/2 lg:w-[500px] bg-white border-b md:border-b-0 md:border-r border-slate-200 md:overflow-y-auto z-10 md:shadow-xl shadow-slate-200/50 flex-shrink-0 hide-scrollbar">
             <InvoiceEditor />
           </section>
           
           {/* Right Column: Live Preview & Action Bar */}
-          <section className="flex-1 bg-slate-100/50 p-4 md:p-8 overflow-y-auto overflow-x-hidden flex flex-col items-center">
+          <section className="flex-1 bg-slate-100/50 p-4 md:p-8 md:overflow-y-auto overflow-x-hidden flex flex-col items-center">
             {/* Action Bar */}
             <div className="w-full max-w-[800px] mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center">
               <h1 className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">Professional Invoice Generator</h1>
