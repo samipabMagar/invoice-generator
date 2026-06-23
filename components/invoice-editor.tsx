@@ -28,8 +28,14 @@ export function InvoiceEditor() {
       // Ensure we attempt to grab the currently logged in user context
       const { data: { user }, error: authError } = await supabase.auth.getUser();
       
+      if (!user) {
+        toast.dismiss(loadingToast);
+        toast.error('You must be signed in to save invoices');
+        return;
+      }
+      
       const { error } = await supabase.from('invoices').insert({
-        user_id: user?.id, // Requires an active session & auth.users link according to our schema
+        user_id: user.id, // Safely guaranteed
         invoice_number: values.invoiceMeta.invoiceNo,
         date: values.invoiceMeta.date,
         due_date: values.invoiceMeta.dueDate,
@@ -41,7 +47,11 @@ export function InvoiceEditor() {
       
       if (error) {
          console.error('Supabase Save Error:', error);
-         toast.error(`Error: ${error.message || 'Check Auth state'}`);
+         if (error.code === '23503') {
+           toast.error('Account Sync Error: Please sign out and create a newly registered account to sync with the database.', { duration: 6000 });
+         } else {
+           toast.error(`Error: ${error.message || 'Check Auth state'}`);
+         }
          return;
       }
       
