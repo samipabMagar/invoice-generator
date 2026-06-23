@@ -29,7 +29,10 @@ const styles = StyleSheet.create({
   bottomSection: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 24 },
   paymentCard: { width: 280, backgroundColor: '#eff6fb', padding: 20, borderRadius: 4 },
   paymentTitle: { fontSize: 12, color: '#4f5660', fontWeight: 'extrabold', marginBottom: 8 },
-  paymentText: { fontSize: 11, color: '#555555', lineHeight: 1.5 },
+  paymentRow: { flexDirection: 'row', marginBottom: 4 },
+  paymentLabel: { fontSize: 11, color: '#4f5660', fontWeight: 'extrabold', width: 90 },
+  paymentText: { fontSize: 11, color: '#555555', flex: 1 },
+  paymentNotes: { fontSize: 11, color: '#555555', lineHeight: 1.5, marginTop: 8 },
   totalsContainer: { width: 200 },
   totalRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
   totalText: { fontSize: 11, color: '#555555' },
@@ -54,9 +57,6 @@ export function InvoicePDF({ data }: { data: InvoiceType }) {
         <View style={styles.headerContainer}>
           <View style={{ flex: 1 }}>
             <Text style={styles.senderName}>{data.senderDetails?.name || ''}</Text>
-            <Text style={styles.senderSub}>
-              {data.senderDetails?.bsb}{data.senderDetails?.accountNumber ? ` ${data.senderDetails.accountNumber}` : ''}
-            </Text>
           </View>
           <View style={{ flex: 1, alignItems: 'flex-end' }}>
             <Text style={styles.invoiceTitle}>Invoice</Text>
@@ -119,11 +119,30 @@ export function InvoicePDF({ data }: { data: InvoiceType }) {
           })}
         </View>
 
-        {/* Bottom Section */}
         <View style={styles.bottomSection}>
           <View style={styles.paymentCard}>
             <Text style={styles.paymentTitle}>Payment Instructions</Text>
-            <Text style={styles.paymentText}>{data.paymentInstructions || ''}</Text>
+            {data.senderDetails?.name && (
+              <View style={styles.paymentRow}>
+                <Text style={styles.paymentLabel}>Name:</Text>
+                <Text style={styles.paymentText}>{data.senderDetails.name}</Text>
+              </View>
+            )}
+            {data.senderDetails?.bsb && (
+              <View style={styles.paymentRow}>
+                <Text style={styles.paymentLabel}>BSB:</Text>
+                <Text style={styles.paymentText}>{data.senderDetails.bsb}</Text>
+              </View>
+            )}
+            {data.senderDetails?.accountNumber && (
+              <View style={styles.paymentRow}>
+                <Text style={styles.paymentLabel}>Account No:</Text>
+                <Text style={styles.paymentText}>{data.senderDetails.accountNumber}</Text>
+              </View>
+            )}
+            {data.paymentInstructions && (
+              <Text style={styles.paymentNotes}>{data.paymentInstructions}</Text>
+            )}
           </View>
           <View style={styles.totalsContainer}>
             <View style={styles.totalRow}>

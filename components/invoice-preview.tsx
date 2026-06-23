@@ -98,11 +98,17 @@ export function InvoicePreview() {
       
       {/* Bottom Section */}
       <div className="flex justify-between items-end mt-auto pt-8">
-        {/* Payment Instructions */}
+        {/* Payment Instructions & Bank Details */}
         <div className="w-[320px] bg-[#eff6fb] p-6 rounded-sm self-start">
           <h3 className="font-semibold text-[#4f5660] mb-3 text-[15px]">Payment Instructions</h3>
-          <div className="whitespace-pre-line text-[#555] text-[14px] leading-relaxed">
-            {values.paymentInstructions || ''}
+          <div className="text-[#555] text-[14px] leading-relaxed flex flex-col gap-1">
+            {values.senderDetails?.name && <span><strong className="font-semibold text-[#4f5660]">Name:</strong> {values.senderDetails.name}</span>}
+            {values.senderDetails?.bsb && <span><strong className="font-semibold text-[#4f5660]">BSB:</strong> {values.senderDetails.bsb}</span>}
+            {values.senderDetails?.accountNumber && <span><strong className="font-semibold text-[#4f5660]">Account Number:</strong> {values.senderDetails.accountNumber}</span>}
+            
+            {values.paymentInstructions && (
+              <span className="whitespace-pre-line mt-2 block">{values.paymentInstructions}</span>
+            )}
           </div>
         </div>
         

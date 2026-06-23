@@ -148,20 +148,10 @@ export function InvoiceEditor() {
             <CardTitle className="text-lg">Your Details</CardTitle>
             <CardDescription>Details appearing at the very top of the invoice.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent>
             <div className="space-y-2">
               <Label>Business / Sender Name</Label>
               <Input {...register('senderDetails.name')} placeholder="e.g. Nayan Thapa" />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>BSB</Label>
-                <Input {...register('senderDetails.bsb')} placeholder="082451" />
-              </div>
-              <div className="space-y-2">
-                <Label>Account Number</Label>
-                <Input {...register('senderDetails.accountNumber')} placeholder="407220013" />
-              </div>
             </div>
           </CardContent>
         </Card>
@@ -270,13 +260,27 @@ export function InvoiceEditor() {
               <Label>Amount Paid (A$)</Label>
               <Input {...register('paid', { valueAsNumber: true })} type="number" step="0.01" placeholder="0.00" />
             </div>
-            <div className="space-y-2">
-              <Label>Payment Instructions</Label>
-              <Textarea 
-                {...register('paymentInstructions')} 
-                rows={4} 
-                className="resize-none"
-              />
+            <div className="pt-4 border-t border-slate-100">
+              <Label className="text-base font-semibold block mb-4">Bank Details (Payment Instructions)</Label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div className="space-y-2">
+                  <Label>BSB</Label>
+                  <Input {...register('senderDetails.bsb')} placeholder="082451" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Account Number</Label>
+                  <Input {...register('senderDetails.accountNumber')} placeholder="407220013" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Additional Notes</Label>
+                <Textarea 
+                  {...register('paymentInstructions')} 
+                  rows={2} 
+                  placeholder="Any extra instructions..."
+                  className="resize-none"
+                />
+              </div>
             </div>
           </CardContent>
         </Card>

@@ -131,18 +131,18 @@ export default function ProfilePage() {
                 <ArrowLeft className="w-4 h-4 mr-1" /> Back to Dashboard
               </Link>
             </div>
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900 flex items-center gap-3">
-              <User className="w-8 h-8 text-sky-500" />
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-3">
+              <User className="w-7 h-7 text-sky-500" />
               Settings & Clients
             </h1>
-            <p className="text-slate-500">Manage your business identity and saved clients.</p>
+            <p className="text-sm text-slate-500">Manage your business identity and saved clients.</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           {/* Business Profile */}
-          <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6 space-y-6">
-            <h2 className="text-xl font-semibold flex items-center gap-2 text-slate-800">
+          <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6 space-y-5">
+            <h2 className="text-lg font-semibold flex items-center gap-2 text-slate-800">
               <Building className="w-5 h-5 text-sky-500" /> Business Profile
             </h2>
             <p className="text-sm text-slate-500">This information securely auto-fills exactly as "Your Details" on new invoices.</p>
@@ -191,9 +191,9 @@ export default function ProfilePage() {
           </div>
 
           {/* Client Management */}
-          <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6 space-y-6 flex flex-col h-[500px]">
+          <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6 space-y-5">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold flex items-center gap-2 text-slate-800">
+              <h2 className="text-lg font-semibold flex items-center gap-2 text-slate-800">
                 <MapPin className="w-5 h-5 text-indigo-500" /> Saved Clients
               </h2>
               <button 
@@ -230,9 +230,9 @@ export default function ProfilePage() {
               </form>
             )}
 
-            <div className="flex-1 overflow-y-auto pr-2 space-y-3">
+            <div className="flex-1 max-h-[400px] overflow-y-auto pr-2 space-y-3">
               {clients.length === 0 && !isAddingClient ? (
-                <div className="h-full flex flex-col items-center justify-center text-slate-400">
+                <div className="py-12 flex flex-col items-center justify-center text-slate-400">
                   <p>No clients saved yet.</p>
                 </div>
               ) : (
