@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Plus, FileText, Trash2, ArrowLeft } from 'lucide-react';
+import { Plus, FileText, Trash2, ArrowLeft, Edit, Download } from 'lucide-react';
 import { toast } from 'sonner';
+import { InvoiceType, defaultInvoiceValues } from '@/lib/schema';
 
 // Type for the fetched invoice
 type SavedInvoice = {
@@ -13,7 +14,7 @@ type SavedInvoice = {
   invoice_number: string;
   date: string;
   due_date: string;
-  items: any[];
+  items: any;
   status: string;
   created_at: string;
 };
@@ -60,9 +61,33 @@ export default function DashboardPage() {
     }
   };
 
-  const calculateTotal = (items: any[]) => {
-    if (!items || !Array.isArray(items)) return 0;
-    return items.reduce((sum, item) => sum + (Number(item.quantity) || 0) * (Number(item.rate) || 0), 0);
+  const handleDownload = async (invoice: SavedInvoice) => {
+    const payload = (invoice.items && !Array.isArray(invoice.items) && invoice.items.invoiceMeta)
+      ? invoice.items as InvoiceType
+      : { 
+          ...defaultInvoiceValues,
+          invoiceMeta: { ...defaultInvoiceValues.invoiceMeta, invoiceNo: invoice.invoice_number, date: invoice.date, dueDate: invoice.due_date },
+          items: Array.isArray(invoice.items) ? invoice.items : [] 
+        } as InvoiceType;
+
+    const { pdf } = await import('@react-pdf/renderer');
+    const { InvoicePDF } = await import('@/components/pdf-document');
+    const blob = await pdf(<InvoicePDF data={payload} />).toBlob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Invoice-${invoice.invoice_number || 'Draft'}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const calculateTotal = (itemsData: any) => {
+    // Legacy support: if it's an array of items
+    const itemList = Array.isArray(itemsData) ? itemsData : (itemsData?.items || []);
+    if (!itemList || !Array.isArray(itemList)) return 0;
+    return itemList.reduce((sum, item) => sum + (Number(item.quantity) || 0) * (Number(item.rate) || 0), 0);
   };
 
   if (loading) {
@@ -134,17 +159,33 @@ export default function DashboardPage() {
                       <td className="px-6 py-4 text-slate-500">{invoice.date || '-'}</td>
                       <td className="px-6 py-4 text-slate-500">{invoice.due_date || '-'}</td>
                       <td className="px-6 py-4 text-slate-500 text-[13px] bg-slate-50/50 inline-flex items-center mt-3 ml-6 rounded-md px-2 py-0.5 border border-slate-100">
-                        {Array.isArray(invoice.items) ? invoice.items.length : 0} items
+                        {Array.isArray(invoice.items) ? invoice.items.length : (invoice.items?.items?.length || 0)} items
                       </td>
                       <td className="px-6 py-4 font-semibold text-slate-900">${calculateTotal(invoice.items).toFixed(2)}</td>
                       <td className="px-6 py-4 text-right">
-                        <button 
-                          onClick={() => deleteInvoice(invoice.id, invoice.invoice_number)}
-                          className="p-2 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-md transition-colors opacity-0 group-hover:opacity-100 cursor-pointer inline-flex focus:opacity-100"
-                          title="Delete invoice"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        <div className="flex items-center justify-end gap-1.5">
+                          <Link 
+                            href={`/?edit=${invoice.id}`}
+                            className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors cursor-pointer inline-flex"
+                            title="Edit invoice"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Link>
+                          <button
+                            onClick={() => handleDownload(invoice)}
+                            className="p-2 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded-md transition-colors cursor-pointer inline-flex"
+                            title="Download PDF"
+                          >
+                            <Download className="w-4 h-4" />
+                          </button>
+                          <button 
+                            onClick={() => deleteInvoice(invoice.id, invoice.invoice_number)}
+                            className="p-2 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-md transition-colors cursor-pointer inline-flex"
+                            title="Delete invoice"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}

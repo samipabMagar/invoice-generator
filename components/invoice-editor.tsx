@@ -25,7 +25,6 @@ export function InvoiceEditor() {
     try {
       const loadingToast = toast.loading('Saving invoice...');
       
-      // Ensure we attempt to grab the currently logged in user context
       const { data: { user }, error: authError } = await supabase.auth.getUser();
       
       if (!user) {
@@ -33,24 +32,50 @@ export function InvoiceEditor() {
         toast.error('You must be signed in to save invoices');
         return;
       }
+
+      // Automatically store their latest sender details securely as their profile defaults!
+      if (values.senderDetails?.name) {
+        await supabase.from('profiles').update({
+          business_name: values.senderDetails.name,
+          bsb: values.senderDetails.bsb,
+          account_number: values.senderDetails.accountNumber
+        }).eq('id', user.id);
+      }
       
-      const { error } = await supabase.from('invoices').insert({
-        user_id: user.id, // Safely guaranteed
-        invoice_number: values.invoiceMeta.invoiceNo,
-        date: values.invoiceMeta.date,
-        due_date: values.invoiceMeta.dueDate,
-        items: values.items,
-        status: 'saved',
-      });
+      // Look for editing intent
+      const urlParams = new URLSearchParams(window.location.search);
+      const editId = urlParams.get('edit');
+      let dbError;
+
+      if (editId) {
+        const { error } = await supabase.from('invoices').update({
+          invoice_number: values.invoiceMeta.invoiceNo,
+          date: values.invoiceMeta.date,
+          due_date: values.invoiceMeta.dueDate,
+          items: values, // Save full form payload universally in JSONB flexibly!
+          status: 'saved',
+        }).eq('id', editId).eq('user_id', user.id);
+        dbError = error;
+      } else {
+        const { error } = await supabase.from('invoices').insert({
+          user_id: user.id,
+          invoice_number: values.invoiceMeta.invoiceNo,
+          date: values.invoiceMeta.date,
+          due_date: values.invoiceMeta.dueDate,
+          items: values, 
+          status: 'saved',
+        });
+        dbError = error;
+      }
       
       toast.dismiss(loadingToast);
       
-      if (error) {
-         console.error('Supabase Save Error:', error);
-         if (error.code === '23503') {
+      if (dbError) {
+         console.error('Supabase Save Error:', dbError);
+         if (dbError.code === '23503') {
            toast.error('Account Sync Error: Please sign out and create a newly registered account to sync with the database.', { duration: 6000 });
          } else {
-           toast.error(`Error: ${error.message || 'Check Auth state'}`);
+           toast.error(`Error: ${dbError.message || 'Check Auth state'}`);
          }
          return;
       }
@@ -162,10 +187,10 @@ export function InvoiceEditor() {
           </CardContent>
         </Card>
 
-        {/* Line Items */}
+        {/* Work Items */}
         <Card className="shadow-none border-slate-200">
           <CardHeader className="pb-4 flex flex-row items-center justify-between">
-            <CardTitle className="text-lg">Line Items</CardTitle>
+            <CardTitle className="text-lg">Work Items</CardTitle>
             <Button type="button" variant="outline" size="sm" onClick={() => append({ id: Math.random().toString(), description: '', quantity: 1, rate: 0 })} className="gap-2">
               <Plus className="w-4 h-4" /> Add Item
             </Button>

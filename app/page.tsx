@@ -2,17 +2,65 @@
 
 import { FormProvider, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect, useRef } from 'react';
+import { supabase } from '@/lib/supabase/supabase';
+import { toast } from 'sonner';
 import { defaultInvoiceValues, invoiceSchema, InvoiceType } from '@/lib/schema';
 import { InvoiceEditor } from '@/components/invoice-editor';
 import { InvoicePreview } from '@/components/invoice-preview';
 
 export default function Home() {
-
   const methods = useForm<InvoiceType>({
     resolver: zodResolver(invoiceSchema),
     defaultValues: defaultInvoiceValues,
     mode: 'onChange',
   });
+
+  const hasRun = useRef(false);
+
+  useEffect(() => {
+    if (hasRun.current) return;
+    hasRun.current = true;
+
+    const loadProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+      if (profile && profile.business_name) {
+        methods.setValue('senderDetails.name', profile.business_name || '');
+        methods.setValue('senderDetails.bsb', profile.bsb || '');
+        methods.setValue('senderDetails.accountNumber', profile.account_number || '');
+      }
+    };
+
+    const loadInvoiceForEdit = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const editId = urlParams.get('edit');
+
+      if (editId) {
+        const loadingToast = toast.loading('Loading invoice...');
+        const { data } = await supabase.from('invoices').select('*').eq('id', editId).single();
+        toast.dismiss(loadingToast);
+        if (data) {
+          // If we saved the full form payload (new format), reset the entire form
+          if (data.items && !Array.isArray(data.items) && data.items.invoiceMeta) {
+            methods.reset(data.items);
+          } else {
+            // Legacy format: only map top-level fields
+            methods.setValue('invoiceMeta.invoiceNo', data.invoice_number);
+            methods.setValue('invoiceMeta.date', data.date);
+            methods.setValue('invoiceMeta.dueDate', data.due_date);
+            methods.setValue('items', Array.isArray(data.items) ? data.items : []);
+          }
+          toast.success('Invoice loaded for editing!');
+        }
+      } else {
+        loadProfile();
+      }
+    };
+
+    loadInvoiceForEdit();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex justify-center">
