@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import { Toaster } from "sonner";
 import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -25,11 +26,12 @@ export default function RootLayout({
       lang="en"
       className={`${poppins.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans" style={{ fontFamily: 'var(--font-poppins), sans-serif' }}>
+      <body className="min-h-screen flex flex-col font-sans" style={{ fontFamily: 'var(--font-poppins), sans-serif' }}>
         <Navbar />
         <main className="flex-1 flex flex-col">
           {children}
         </main>
+        <Footer />
         <Toaster position="top-right" richColors />
       </body>
     </html>
