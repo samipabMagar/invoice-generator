@@ -11,7 +11,7 @@ import { InvoicePreview } from '@/components/invoice-preview';
 
 export default function Home() {
   const methods = useForm<InvoiceType>({
-    resolver: zodResolver(invoiceSchema),
+    resolver: zodResolver(invoiceSchema as any),
     defaultValues: defaultInvoiceValues,
     mode: 'onChange',
   });
