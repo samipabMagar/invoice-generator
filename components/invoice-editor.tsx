@@ -7,13 +7,34 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, Trash2, Download, Save } from 'lucide-react';
+import { Plus, Trash2, Download, Save, Users } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { supabase } from '@/lib/supabase/supabase';
 import { toast } from 'sonner';
+import { useState, useEffect } from 'react';
 
 export function InvoiceEditor() {
-  const { register, control, getValues, formState: { errors } } = useFormContext<InvoiceType>();
+  const { register, control, getValues, setValue, formState: { errors } } = useFormContext<InvoiceType>();
+  const [clients, setClients] = useState<any[]>([]);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) {
+        supabase.from('clients').select('*').eq('user_id', data.user.id).then(({ data }) => {
+          if (data) setClients(data);
+        });
+      }
+    });
+  }, []);
+
+  const handleClientSelect = (clientId: string) => {
+    if (!clientId) return;
+    const client = clients.find(c => c.id === clientId);
+    if (client) {
+       setValue('clientDetails.name', client.name || '');
+       setValue('clientDetails.address', client.address || '');
+    }
+  };
   
   const { fields, append, remove } = useFieldArray({
     control,
@@ -172,8 +193,20 @@ export function InvoiceEditor() {
 
         {/* Bill To Details */}
         <Card className="shadow-none border-slate-200">
-          <CardHeader className="pb-4">
+          <CardHeader className="pb-4 flex flex-row items-center justify-between">
             <CardTitle className="text-lg">Bill To</CardTitle>
+            {clients.length > 0 && (
+              <select 
+                title="Select a saved client"
+                onChange={(e) => handleClientSelect(e.target.value)}
+                className="text-sm border border-slate-200 rounded-md px-2 py-1 bg-slate-50 text-slate-600 focus:outline-none focus:ring-1 focus:ring-sky-500 cursor-pointer max-w-[200px] truncate"
+              >
+                <option value="">Load saved client...</option>
+                {clients.map(c => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            )}
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -227,17 +260,24 @@ export function InvoiceEditor() {
           </CardContent>
         </Card>
 
-        {/* Payment Instructions */}
+        {/* Financials & Payment */}
         <Card className="shadow-none border-slate-200">
           <CardHeader className="pb-4">
-            <CardTitle className="text-lg">Payment Instructions</CardTitle>
+            <CardTitle className="text-lg">Financials & Payment</CardTitle>
           </CardHeader>
-          <CardContent>
-            <Textarea 
-              {...register('paymentInstructions')} 
-              rows={4} 
-              className="resize-none"
-            />
+          <CardContent className="space-y-6">
+            <div className="space-y-2">
+              <Label>Amount Paid (A$)</Label>
+              <Input {...register('paid', { valueAsNumber: true })} type="number" step="0.01" placeholder="0.00" />
+            </div>
+            <div className="space-y-2">
+              <Label>Payment Instructions</Label>
+              <Textarea 
+                {...register('paymentInstructions')} 
+                rows={4} 
+                className="resize-none"
+              />
+            </div>
           </CardContent>
         </Card>
       </div>

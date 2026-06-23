@@ -87,6 +87,13 @@ export function Navbar() {
                     >
                       Your Dashboard
                     </Link>
+                    <Link 
+                      href="/profile" 
+                      onClick={() => setIsProfileOpen(false)}
+                      className="flex w-full items-center px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-sky-600 rounded-md transition-colors"
+                    >
+                      Profile & Clients
+                    </Link>
                   </div>
                   <div className="px-1 py-1 border-t border-slate-100 mt-1">
                     <button 

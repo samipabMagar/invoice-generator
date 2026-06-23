@@ -8,8 +8,8 @@ const styles = StyleSheet.create({
   senderName: { fontSize: 28, color: '#4f5660', fontWeight: 'extrabold', marginBottom: 8 },
   senderSub: { fontSize: 12, color: '#555555' },
   invoiceTitle: { fontSize: 36, color: '#4f5660', textAlign: 'right', marginBottom: 24 },
-  tableCell: { fontSize: 11, color: '#555555', textAlign: 'right' },
-  tableLabel: { fontSize: 11, color: '#4f5660', fontWeight: 'extrabold', paddingRight: 16, textAlign: 'right' },
+  tableCell: { fontSize: 11, color: '#555555', textAlign: 'right', minWidth: 70 },
+  tableLabel: { fontSize: 11, color: '#4f5660', fontWeight: 'extrabold', paddingRight: 8, textAlign: 'right' },
   metaTable: { flexDirection: 'column' },
   metaRow: { flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 4 },
   divider: { borderBottomWidth: 1, borderBottomColor: '#eeeeee', marginBottom: 32 },
@@ -44,19 +44,21 @@ export function InvoicePDF({ data }: { data: InvoiceType }) {
     const rate = Number(item.rate) || 0;
     return acc + (qty * rate);
   }, 0);
+  const paid = Number(data.paid) || 0;
+  const balanceDue = subtotal - paid;
   
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         {/* Header */}
         <View style={styles.headerContainer}>
-          <View>
-            <Text style={styles.senderName}>{data.senderDetails?.name || 'Sender Name'}</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.senderName}>{data.senderDetails?.name || ''}</Text>
             <Text style={styles.senderSub}>
               {data.senderDetails?.bsb}{data.senderDetails?.accountNumber ? ` ${data.senderDetails.accountNumber}` : ''}
             </Text>
           </View>
-          <View>
+          <View style={{ flex: 1, alignItems: 'flex-end' }}>
             <Text style={styles.invoiceTitle}>Invoice</Text>
             <View style={styles.metaTable}>
               <View style={styles.metaRow}>
@@ -134,11 +136,11 @@ export function InvoicePDF({ data }: { data: InvoiceType }) {
             </View>
             <View style={styles.totalRow}>
               <Text style={styles.totalText}>Paid</Text>
-              <Text style={styles.totalText}>A$0.00</Text>
+              <Text style={styles.totalText}>A${paid.toFixed(2)}</Text>
             </View>
             <View style={styles.balanceRow}>
               <Text style={styles.balanceLabel}>Balance Due</Text>
-              <Text style={styles.balanceValue}>A${subtotal.toFixed(2)}</Text>
+              <Text style={styles.balanceValue}>A${balanceDue.toFixed(2)}</Text>
             </View>
           </View>
         </View>

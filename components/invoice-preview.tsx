@@ -14,7 +14,8 @@ export function InvoicePreview() {
   }, 0);
   
   const total = subtotal;
-  const balanceDue = total;
+  const paid = Number(values.paid) || 0;
+  const balanceDue = total - paid;
   const ABN = [values.senderDetails?.bsb, values.senderDetails?.accountNumber].filter(Boolean).join('');
   
   return (
@@ -117,7 +118,7 @@ export function InvoicePreview() {
           </div>
           <div className="flex justify-between mb-[24px]">
             <span className="text-[#555]">Paid</span>
-            <span className="text-[#555]">A$0.00</span>
+            <span className="text-[#555]">A${paid.toFixed(2)}</span>
           </div>
           <div className="flex justify-between border-y-[3px] border-[#81cbf0] py-3 mt-4 text-[18px]">
             <span className="font-semibold text-[#4f5660]">Balance Due</span>

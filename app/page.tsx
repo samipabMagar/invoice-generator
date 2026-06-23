@@ -31,6 +31,14 @@ export default function Home() {
         methods.setValue('senderDetails.bsb', profile.bsb || '');
         methods.setValue('senderDetails.accountNumber', profile.account_number || '');
       }
+
+      // Automatically generate next Invoice Number based on database count!
+      const currentInvNo = methods.getValues('invoiceMeta.invoiceNo');
+      if (!currentInvNo || currentInvNo === '') {
+        const { count } = await supabase.from('invoices').select('*', { count: 'exact', head: true }).eq('user_id', user.id);
+        const nextInvNumber = `INV-${String((count || 0) + 1).padStart(3, '0')}`;
+        methods.setValue('invoiceMeta.invoiceNo', nextInvNumber);
+      }
     };
 
     const loadInvoiceForEdit = async () => {

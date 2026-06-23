@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Plus, FileText, Trash2, ArrowLeft, Edit, Download } from 'lucide-react';
+import { Plus, FileText, Trash2, Edit, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import { InvoiceType, defaultInvoiceValues } from '@/lib/schema';
 
@@ -99,17 +99,12 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 px-4 md:px-8 py-8">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-slate-50 text-slate-900">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 space-y-8">
         
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <div className="flex items-center gap-2 text-slate-500 mb-2">
-              <Link href="/" className="hover:text-slate-900 transition-colors inline-flex items-center text-sm font-medium">
-                <ArrowLeft className="w-4 h-4 mr-1" /> Back to Generator
-              </Link>
-            </div>
             <h1 className="text-3xl font-bold tracking-tight text-slate-900">Your Invoices</h1>
             <p className="text-slate-500">Manage and track all your generated invoices.</p>
           </div>
@@ -158,8 +153,10 @@ export default function DashboardPage() {
                       </td>
                       <td className="px-6 py-4 text-slate-500">{invoice.date || '-'}</td>
                       <td className="px-6 py-4 text-slate-500">{invoice.due_date || '-'}</td>
-                      <td className="px-6 py-4 text-slate-500 text-[13px] bg-slate-50/50 inline-flex items-center mt-3 ml-6 rounded-md px-2 py-0.5 border border-slate-100">
-                        {Array.isArray(invoice.items) ? invoice.items.length : (invoice.items?.items?.length || 0)} items
+                      <td className="px-6 py-4 text-slate-500">
+                        <span className="text-[13px] bg-slate-100 rounded-md px-2 py-0.5 border border-slate-200">
+                          {Array.isArray(invoice.items) ? invoice.items.length : (invoice.items?.items?.length || 0)} items
+                        </span>
                       </td>
                       <td className="px-6 py-4 font-semibold text-slate-900">${calculateTotal(invoice.items).toFixed(2)}</td>
                       <td className="px-6 py-4 text-right">
