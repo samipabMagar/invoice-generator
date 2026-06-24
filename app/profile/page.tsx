@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 type Profile = {
   id: string;
   business_name: string | null;
+  tax_id: string | null;
   bsb: string | null;
   account_number: string | null;
 };
@@ -22,7 +23,7 @@ type Client = {
 };
 
 export default function ProfilePage() {
-  const [profile, setProfile] = useState<Profile>({ id: '', business_name: '', bsb: '', account_number: '' });
+  const [profile, setProfile] = useState<Profile>({ id: '', business_name: '', tax_id: '', bsb: '', account_number: '' });
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [savingProfile, setSavingProfile] = useState(false);
@@ -47,6 +48,7 @@ export default function ProfilePage() {
       setProfile({
         id: user.id,
         business_name: profileData.business_name || '',
+        tax_id: profileData.tax_id || '',
         bsb: profileData.bsb || '',
         account_number: profileData.account_number || '',
       });
@@ -65,6 +67,7 @@ export default function ProfilePage() {
     setSavingProfile(true);
     const { error } = await supabase.from('profiles').update({
       business_name: profile.business_name,
+      tax_id: profile.tax_id,
       bsb: profile.bsb,
       account_number: profile.account_number
     }).eq('id', profile.id);
@@ -148,15 +151,27 @@ export default function ProfilePage() {
             <p className="text-sm text-slate-500">This information securely auto-fills exactly as "Your Details" on new invoices.</p>
             
             <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">Business Name</label>
-                <input 
-                  type="text"
-                  value={profile.business_name || ''}
-                  onChange={(e) => setProfile({...profile, business_name: e.target.value})}
-                  className="flex h-10 w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
-                  placeholder="e.g. Acme Corp"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-700">Business Name</label>
+                  <input 
+                    type="text"
+                    value={profile.business_name || ''}
+                    onChange={(e) => setProfile({...profile, business_name: e.target.value})}
+                    className="flex h-10 w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
+                    placeholder="e.g. Acme Corp"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-700">Tax ID / ABN</label>
+                  <input 
+                    type="text"
+                    value={profile.tax_id || ''}
+                    onChange={(e) => setProfile({...profile, tax_id: e.target.value})}
+                    className="flex h-10 w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
+                    placeholder="e.g. 11 222 333 444"
+                  />
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">

@@ -4,6 +4,7 @@ CREATE TABLE public.profiles (
   email text,
   full_name text,
   business_name text,
+  tax_id text,
   address text,
   phone text,
   bsb text,

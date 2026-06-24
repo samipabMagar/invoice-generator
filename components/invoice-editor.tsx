@@ -149,9 +149,15 @@ export function InvoiceEditor() {
             <CardDescription>Details appearing at the very top of the invoice.</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              <Label>Business / Sender Name</Label>
-              <Input {...register('senderDetails.name')} placeholder="e.g. Nayan Thapa" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Business / Sender Name</Label>
+                <Input {...register('senderDetails.name')} placeholder="e.g. Nayan Thapa" />
+              </div>
+              <div className="space-y-2">
+                <Label>Tax ID / ABN</Label>
+                <Input {...register('senderDetails.taxId')} placeholder="e.g. 11 222 333 444" />
+              </div>
             </div>
           </CardContent>
         </Card>

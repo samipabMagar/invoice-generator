@@ -57,6 +57,9 @@ export function InvoicePDF({ data }: { data: InvoiceType }) {
         <View style={styles.headerContainer}>
           <View style={{ flex: 1 }}>
             <Text style={styles.senderName}>{data.senderDetails?.name || ''}</Text>
+            {data.senderDetails?.taxId && (
+              <Text style={styles.senderSub}>{data.senderDetails.taxId}</Text>
+            )}
           </View>
           <View style={{ flex: 1, alignItems: 'flex-end' }}>
             <Text style={styles.invoiceTitle}>Invoice</Text>

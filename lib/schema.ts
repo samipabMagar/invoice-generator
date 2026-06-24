@@ -10,6 +10,7 @@ export const invoiceItemSchema = z.object({
 export const invoiceSchema = z.object({
   senderDetails: z.object({
     name: z.string().optional(),
+    taxId: z.string().optional(),
     address: z.string().optional(),
     phone: z.string().optional(),
     email: z.string().optional(),
@@ -35,7 +36,7 @@ export type InvoiceType = z.infer<typeof invoiceSchema>;
 export type InvoiceItemType = z.infer<typeof invoiceItemSchema>;
 
 export const defaultInvoiceValues: InvoiceType = {
-  senderDetails: { name: '', bsb: '', accountNumber: '' },
+  senderDetails: { name: '', taxId: '', bsb: '', accountNumber: '' },
   clientDetails: { name: '', address: '' },
   invoiceMeta: {
     invoiceNo: '',

@@ -28,6 +28,7 @@ export default function Home() {
       const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
       if (profile && profile.business_name) {
         methods.setValue('senderDetails.name', profile.business_name || '');
+        methods.setValue('senderDetails.taxId', profile.tax_id || '');
         methods.setValue('senderDetails.bsb', profile.bsb || '');
         methods.setValue('senderDetails.accountNumber', profile.account_number || '');
       }

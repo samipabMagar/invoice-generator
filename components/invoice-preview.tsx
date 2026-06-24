@@ -26,9 +26,11 @@ export function InvoicePreview() {
           <h1 className="text-[34px] font-semibold text-[#4f5660] tracking-tight mb-3 leading-none">
             {values.senderDetails?.name || 'Sender Name'}
           </h1>
-          <p className="text-[14px] text-[#555]">
-            {values.senderDetails?.bsb}{values.senderDetails?.accountNumber ? `${values.senderDetails.accountNumber}` : ''}
-          </p>
+          {values.senderDetails?.taxId && (
+            <p className="text-[14px] text-[#555]">
+              {values.senderDetails.taxId}
+            </p>
+          )}
         </div>
         <div className="flex flex-col items-end">
           <h2 className="text-[40px] font-normal text-[#4f5660] tracking-tight mb-[24px] leading-none">Invoice</h2>
