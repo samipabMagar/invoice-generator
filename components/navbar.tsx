@@ -128,7 +128,10 @@ export function Navbar() {
           <nav className="flex flex-col p-4 space-y-4 shadow-xl">
             <Link onClick={() => setIsMobileMenuOpen(false)} href="/" className={`text-sm font-medium ${pathname === '/' ? 'text-sky-600' : 'text-slate-600'}`}>Generator</Link>
             {user && (
-              <Link onClick={() => setIsMobileMenuOpen(false)} href="/dashboard" className={`text-sm font-medium ${pathname === '/dashboard' ? 'text-sky-600' : 'text-slate-600'}`}>Dashboard</Link>
+              <>
+                <Link onClick={() => setIsMobileMenuOpen(false)} href="/dashboard" className={`text-sm font-medium ${pathname === '/dashboard' ? 'text-sky-600' : 'text-slate-600'}`}>Dashboard</Link>
+                <Link onClick={() => setIsMobileMenuOpen(false)} href="/profile" className={`text-sm font-medium ${pathname === '/profile' ? 'text-sky-600' : 'text-slate-600'}`}>Profile & Clients</Link>
+              </>
             )}
             <hr className="border-slate-100" />
             {user ? (

@@ -75,7 +75,7 @@ export default function LoginPage() {
         
         <div className="z-10">
           <Link href="/" className="inline-flex items-center text-sm font-medium text-slate-300 hover:text-white transition-colors">
-            <ArrowLeft className="w-4 h-4 mr-2" /> Back to Dashboard
+            <ArrowLeft className="w-4 h-4 mr-2" /> Back to Home
           </Link>
         </div>
 
@@ -103,7 +103,7 @@ export default function LoginPage() {
           {/* Mobile Back Button */}
           <div className="lg:hidden mb-8">
              <Link href="/" className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">
-              <ArrowLeft className="w-4 h-4 mr-2" /> Back to Dashboard
+              <ArrowLeft className="w-4 h-4 mr-2" /> Back to Home
             </Link>
           </div>
 
